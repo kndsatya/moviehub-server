@@ -1,7 +1,8 @@
 package com.moviehub.models;
 
-import java.util.List;
+import java.util.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,15 +13,20 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name="User")
+@JsonIdentityInfo(
+		  generator = ObjectIdGenerators.PropertyGenerator.class, 
+		  property = "id")
 public class User {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	int userId;
+	Integer id;
 	
 	String username;
 	String firstName;
@@ -31,26 +37,34 @@ public class User {
 	Role role;
 	String dateOfBirth;
 	
-	@ManyToMany
-	@JoinTable(name="LikedMovies", joinColumns=@JoinColumn(name="userId", referencedColumnName="ID"), 
-	inverseJoinColumns=@JoinColumn(name="imdbId", referencedColumnName="ID"))
+	@ManyToMany(cascade = CascadeType.PERSIST)
+	@JoinTable(name="LIKES", joinColumns=@JoinColumn(name="USER_ID"),
+			inverseJoinColumns=@JoinColumn(name=
+			   "MOVIE_ID"))
 	@JsonIgnore
-	List<Movie> moviesLikedByUser;
+	List<Movie> likedMovies;
+	
+	@ManyToMany(cascade = CascadeType.PERSIST)
+	@JoinTable(name="REVIEWS", joinColumns=@JoinColumn(name="USER_ID"),
+			inverseJoinColumns=@JoinColumn(name=
+			   "MOVIE_ID"))
+	@JsonIgnore
+	List<Movie> reviewedMovies;
 	
 	@OneToMany(mappedBy="user")
 	@JsonIgnore
-	List<Movie> moviesReviewedByUser;
+	List<Review> reviews;
 	
 	public User() {
 	
 	}
-
-	public int getUserId() {
-		return userId;
+	
+	public Integer getId() {
+		return id;
 	}
 
-	public void setUserId(int userId) {
-		this.userId = userId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getUsername() {
@@ -117,19 +131,27 @@ public class User {
 		this.dateOfBirth = dateOfBirth;
 	}
 
-	public List<Movie> getMoviesLikedByUser() {
-		return moviesLikedByUser;
+	public List<Movie> getLikedMovies() {
+		return likedMovies;
 	}
 
-	public void setMoviesLikedByUser(List<Movie> moviesLikedByUser) {
-		this.moviesLikedByUser = moviesLikedByUser;
+	public void setLikedMovies(List<Movie> likedMovies) {
+		this.likedMovies = likedMovies;
 	}
 
-	public List<Movie> getMoviesReviewedByUser() {
-		return moviesReviewedByUser;
+	public List<Movie> getReviewedMovies() {
+		return reviewedMovies;
 	}
 
-	public void setMoviesReviewedByUser(List<Movie> moviesReviewedByUser) {
-		this.moviesReviewedByUser = moviesReviewedByUser;
+	public void setReviewedMovies(List<Movie> reviewedMovies) {
+		this.reviewedMovies = reviewedMovies;
+	}
+
+	public List<Review> getReviews() {
+		return reviews;
+	}
+
+	public void setReviews(List<Review> reviews) {
+		this.reviews = reviews;
 	}
 }

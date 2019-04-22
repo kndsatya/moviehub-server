@@ -7,50 +7,52 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="Review")
 public class Review {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	int reviewId;
+	Integer id;
 	
-	@ManyToOne
-	String movieReviewed;
+	@ManyToOne()
+	@JsonIgnore
+	Movie movie;
 	
-	@ManyToOne
-	int reviewedBy;
+	@ManyToOne()
+	@JsonIgnore
+	User user;
 	
 	String reviewComments;
 	
-	public Review(String movieId, int userId, String reviewComments) {
-		this.movieReviewed = movieId;
-		this.reviewedBy = userId;
-		this.reviewComments = reviewComments;
+	public Review() {
+		
 	}
 
 	public int getReviewId() {
-		return reviewId;
+		return id;
 	}
 
 	public void setReviewId(int reviewId) {
-		this.reviewId = reviewId;
+		this.id = reviewId;
 	}
 
-	public String getMovieReviewed() {
-		return movieReviewed;
+	public Movie getMovieReviewed() {
+		return movie;
 	}
 
-	public void setMovieReviewed(String movieReviewed) {
-		this.movieReviewed = movieReviewed;
+	public void setMovieReviewed(Movie movieReviewed) {
+		this.movie = movieReviewed;
 	}
 
-	public int getReviewedBy() {
-		return reviewedBy;
+	public User getReviewedBy() {
+		return user;
 	}
 
-	public void setReviewedBy(int reviewedBy) {
-		this.reviewedBy = reviewedBy;
+	public void setReviewedBy(User reviewedBy) {
+		this.user = reviewedBy;
 	}
 
 	public String getReviewComments() {

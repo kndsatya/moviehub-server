@@ -1,5 +1,7 @@
 package com.moviehub.services;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moviehub.models.Movie;
+import com.moviehub.models.Review;
 import com.moviehub.models.Role;
 import com.moviehub.models.User;
 import com.moviehub.repositories.MovieRepository;
@@ -29,6 +32,11 @@ public class UserService {
 	
 	@PostMapping("/api/users")
 	public User createUser(@RequestBody User user) {
+		
+		user.setLikedMovies(new ArrayList<>());
+		user.setReviewedMovies(new ArrayList<>());
+		user.setReviews(new ArrayList<>());
+		
 		userRepository.save(user);
 		return user;
 	}
@@ -52,49 +60,93 @@ public class UserService {
 		
 	}
 	
-	@GetMapping("/api/login")
-	public User login(@PathVariable String username, @PathVariable String password, 
-			HttpSession session) {
+	@PostMapping("/api/login")
+	public User login(@RequestBody User user, HttpSession session) {
 		
-		return (User) userRepository.authenticateUser(username, password);
+		Iterator<User> userIterator = userRepository.findAll().iterator();
+
+	    while (userIterator.hasNext()) {
+	    	
+	      User existingUser = userIterator.next();
+	      
+	      if (existingUser.getUsername().equals(user.getUsername()) &&
+	              existingUser.getPassword().equals(user.getPassword())) {
+	    	  
+	        session.setAttribute("currentUser", existingUser);
+	        return existingUser;
+	      }
+	    }
+	
+	    return new User();
 		
 	}
 	
 	@PostMapping("/api/logout")
 	public void logout(HttpSession session) {
-		session.removeAttribute("currentUser");
+		session.invalidate();
+	}
+	
+	@GetMapping("/api/profile")
+	  public User profile(HttpSession session) {
+		
+		if (session.getAttribute("currentUser") != null) {
+	      return (User) session.getAttribute("currentUser");
+	    }
+		
+	    return new User();
+	}
+	
+	@PostMapping("/api/loggedin")
+	public User loggedIn(HttpSession session) {
+		return (User) session.getAttribute("currentUser");	
 	}
 	
 	@GetMapping("/api/users")
 	public List<User> findAllUsers() {
-		return (List<User>) userRepository.findAll();
-	}
-	
-	@PostMapping("/api/user/{userId}/movie/{movieId}")
-	public void likeMovie(@PathVariable("userId") int userId,
-			@PathVariable("movieId") String movieId) {
 		
-		User user = userRepository.findById(userId).get();
-		Movie movie = movieRepository.findById(movieId).get();
+		List<User> allUsers = new ArrayList<>();
+
+	    Iterator<User> userIterator = userRepository.findAll().iterator();
+
+	    while (userIterator.hasNext()) {
+	      allUsers.add(userIterator.next());
+	    }
 		
-		user.getMoviesLikedByUser().add(movie);
-		userRepository.save(user);
+		return allUsers;
 	}
 	
 	@GetMapping("/api/user/{userId}/movies")
-	public List<Movie> findAllMoviesLikedOrReviewedByUser(@PathVariable("userId") int userId) {
+	public Iterable<Movie> findAllMoviesLikedOrReviewedByUser(@PathVariable("userId") int userId,
+			HttpSession session) {
+		
+		User currentUser = (User) session.getAttribute("currentUser");
+		
+		if (userId == currentUser.getId()) {
+			
+			User user = userRepository.findById(userId).get();
+			
+			if (user.getRole() == Role.USER) {
+				return user.getLikedMovies();
+			}
+			
+			else if (user.getRole() == Role.CRITIC) {
+				return user.getReviewedMovies();
+			}
+			
+			else {
+				return new ArrayList<>();
+			}
+		}
+		
+		else {
+			return new ArrayList<>();
+		}	
+	}
+	
+	@GetMapping("/api/user/{userId}/reviews")
+	public Iterable<Review> findAllUserReviews(@PathVariable("userId") int userId) {
 		
 		User user = userRepository.findById(userId).get();
-		
-		if (user.getRole() == Role.USER) {
-			return user.getMoviesLikedByUser();
-		}
-		
-		else if (user.getRole() == Role.CRITIC) {
-			return user.getMoviesReviewedByUser();
-		}
-		
-		return null;
+		return user.getReviews();
 	}
-
 }

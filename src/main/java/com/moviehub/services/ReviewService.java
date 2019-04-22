@@ -1,5 +1,7 @@
 package com.moviehub.services;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,21 +29,24 @@ public class ReviewService {
 	
 	@PostMapping("/api/user/{userId}/movie/{movieId}/review")
 	public void postReview(@PathVariable("userId") int userId,
-			@PathVariable("movieId") String movieId, @RequestBody String reviewComments) {
+			@PathVariable("movieId") String movieId, @RequestBody Review review, 
+			HttpSession session) {
 		
-		User user = userRepository.findById(userId).get();
-		Movie movie = movieRepository.findById(movieId).get();
+		User currentUser = (User) session.getAttribute("currentUser");
 		
-		if (user != null && movie != null) {
-			Review review = new Review(movieId, userId, reviewComments);
+		if (userId == currentUser.getId()) {
+		
+			User user = userRepository.findById(userId).get();
+			Movie movie = movieRepository.findById(movieId).get();
 			
-			user.getMoviesReviewedByUser().add(movie);
-			userRepository.save(user);
+			review.setMovieReviewed(movie);
+			review.setReviewedBy(user);
 			
-			movie.saveReview(review);
-			movieRepository.save(movie);
+			movie.getReviewedUsers().add(user);
+			user.getReviewedMovies().add(movie);
 			
 			reviewRepository.save(review);
+			
 		}
 	}
 	

@@ -4,38 +4,48 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="Movie")
 public class Movie {
 	
 	@Id
-	String imdbId;
+	String id;
 	
+	String imdbId;
 	String title;
-	String posterUrl;
-	String plot;
+	String poster_path;
+	String overview;
 	String genre;
 	String actors;
 	
-	@ManyToMany
-	@JoinTable(name="LikedMovies", joinColumns=@JoinColumn(name="imdbId", referencedColumnName="ID"), 
-	inverseJoinColumns=@JoinColumn(name="userId", referencedColumnName="ID"))
-	List<User> likedBy;
+	@ManyToMany(mappedBy="likedMovies")
+	@JsonIgnore
+	List<User> likedUsers;
 	
-	@ManyToMany
-	List<User> reviewedBy;
+	@ManyToMany(mappedBy="reviewedMovies")
+	@JsonIgnore
+	List<User> reviewedUsers;
 	
 	@OneToMany(mappedBy="movie")
+	@JsonIgnore
 	List<Review> reviews;
 	
 	public Movie() {
 		
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getImdbId() {
@@ -54,20 +64,20 @@ public class Movie {
 		this.title = title;
 	}
 
-	public String getPosterUrl() {
-		return posterUrl;
+	public String getPoster_path() {
+		return poster_path;
 	}
 
-	public void setPosterUrl(String posterUrl) {
-		this.posterUrl = posterUrl;
+	public void setPoster_path(String poster_path) {
+		this.poster_path = poster_path;
 	}
 
-	public String getPlot() {
-		return plot;
+	public String getOverview() {
+		return overview;
 	}
 
-	public void setPlot(String plot) {
-		this.plot = plot;
+	public void setOverview(String overview) {
+		this.overview = overview;
 	}
 
 	public String getGenre() {
@@ -86,22 +96,22 @@ public class Movie {
 		this.actors = actors;
 	}
 
-	public List<User> getLikedBy() {
-		return likedBy;
+	public List<User> getLikedUsers() {
+		return likedUsers;
 	}
 
-	public void setLikedBy(List<User> likedBy) {
-		this.likedBy = likedBy;
+	public void setLikedUsers(List<User> likedUsers) {
+		this.likedUsers = likedUsers;
 	}
 
-	public List<User> getReviewedBy() {
-		return reviewedBy;
+	public List<User> getReviewedUsers() {
+		return reviewedUsers;
 	}
 
-	public void setReviewedBy(List<User> reviewedBy) {
-		this.reviewedBy = reviewedBy;
+	public void setReviewedUsers(List<User> reviewedUsers) {
+		this.reviewedUsers = reviewedUsers;
 	}
-	
+
 	public List<Review> getReviews() {
 		return reviews;
 	}
@@ -110,8 +120,5 @@ public class Movie {
 		this.reviews = reviews;
 	}
 	
-	public void saveReview(Review review) {
-		this.reviews.add(review);
-	}
 	
 }
