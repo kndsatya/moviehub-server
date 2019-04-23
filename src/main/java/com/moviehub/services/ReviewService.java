@@ -137,6 +137,7 @@ public class ReviewService {
           if (rev.getMovie().getId().equals(review.getMovie().getId())
 
                   && rev.getUser().getId().intValue() == review.getUser().getId().intValue()) {
+		  Collections.reverse(result);
             return gson.toJson(result);
           }
         }
@@ -149,6 +150,7 @@ public class ReviewService {
         user.getReviews().remove(review);
         userRepository.save(user);
         movieRepository.save(movie);
+	Collections.reverse(result);
         return gson.toJson(result);
       }
     }
