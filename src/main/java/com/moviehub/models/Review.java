@@ -2,10 +2,12 @@ package com.moviehub.models;
 
 import com.google.gson.annotations.Expose;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -30,6 +32,8 @@ public class Review {
   @Expose
 	User user;
 	@Expose
+  @Lob
+  @Column(length=50000)
 	String reviewComment;
 	
 	public Review() {
