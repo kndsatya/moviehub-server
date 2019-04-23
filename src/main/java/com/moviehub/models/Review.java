@@ -1,5 +1,7 @@
 package com.moviehub.models;
 
+import com.google.gson.annotations.Expose;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,17 +17,20 @@ public class Review {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Expose
 	Integer id;
 	
 	@ManyToOne()
 	@JsonIgnore
+  @Expose
 	Movie movie;
 	
 	@ManyToOne()
 	@JsonIgnore
+  @Expose
 	User user;
-	
-	String reviewComments;
+	@Expose
+	String reviewComment;
 	
 	public Review() {
 		
@@ -55,13 +60,11 @@ public class Review {
 		this.user = user;
 	}
 
-	public String getReviewComments() {
-		return reviewComments;
+	public String getReviewComment() {
+		return reviewComment;
 	}
 
-	public void setReviewComments(String reviewComments) {
-		this.reviewComments = reviewComments;
+	public void setReviewComment(String reviewComment) {
+		this.reviewComment = reviewComment;
 	}
-
-	
 }

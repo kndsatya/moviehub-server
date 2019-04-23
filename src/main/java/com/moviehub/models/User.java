@@ -1,5 +1,7 @@
 package com.moviehub.models;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.*;
 
 import javax.persistence.CascadeType;
@@ -15,6 +17,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
@@ -26,8 +29,10 @@ public class User {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+  @Expose
 	Integer id;
-	
+
+	@Expose
 	String username;
 	String firstName;
 	String lastName;
@@ -50,7 +55,7 @@ public class User {
 			   "MOVIE_ID"))
 	@JsonIgnore
 	Set<Movie> reviewedMovies;
-	
+
 	@OneToMany(mappedBy="user")
 	@JsonIgnore
 	List<Review> reviews;
@@ -154,4 +159,34 @@ public class User {
 	public void setReviews(List<Review> reviews) {
 		this.reviews = reviews;
 	}
+
+	public void set(User newUser){
+
+		this.username = newUser.username;
+		this.password = newUser.password;
+		this.email = newUser.email;
+		this.firstName = newUser.firstName;
+		this.lastName = newUser.lastName;
+		this.phoneNumber = newUser.phoneNumber;
+		this.role = newUser.role;
+		this.dateOfBirth = newUser.dateOfBirth;
+
+	}
+
+	@Override
+	public boolean equals(Object o){
+		if(o==this){
+			return true;
+		}
+
+		if(!(o instanceof  User)){
+			return false;
+		}
+
+		User user = (User)o;
+
+		return this.id.intValue() == user.getId().intValue();
+
+	}
+
 }

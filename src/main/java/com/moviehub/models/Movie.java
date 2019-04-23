@@ -1,8 +1,11 @@
 package com.moviehub.models;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -16,9 +19,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Movie {
 	
 	@Id
+  @Expose
 	String id;
 	
-	String imdbId;
+	String imdb_id;
+	@Expose
 	String title;
 	String poster_path;
 	String overview;
@@ -41,6 +46,22 @@ public class Movie {
 		
 	}
 
+
+	@Override
+  public boolean equals(Object o){
+		if(o==this){
+			return true;
+		}
+
+		if(!(o instanceof  Movie)){
+				return false;
+		}
+
+		Movie movie = (Movie)o;
+
+		return this.id.equals(movie.getId());
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -49,15 +70,16 @@ public class Movie {
 		this.id = id;
 	}
 
-	public String getImdbId() {
-		return imdbId;
-	}
 
-	public void setImdbId(String imdbId) {
-		this.imdbId = imdbId;
-	}
+  public String getImdb_id() {
+    return imdb_id;
+  }
 
-	public String getTitle() {
+  public void setImdb_id(String imdb_id) {
+    this.imdb_id = imdb_id;
+  }
+
+  public String getTitle() {
 		return title;
 	}
 
