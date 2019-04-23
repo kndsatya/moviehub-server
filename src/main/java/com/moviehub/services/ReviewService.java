@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -137,7 +139,7 @@ public class ReviewService {
           if (rev.getMovie().getId().equals(review.getMovie().getId())
 
                   && rev.getUser().getId().intValue() == review.getUser().getId().intValue()) {
-		  Collections.reverse(result);
+            Collections.reverse(result);
             return gson.toJson(result);
           }
         }
@@ -150,7 +152,7 @@ public class ReviewService {
         user.getReviews().remove(review);
         userRepository.save(user);
         movieRepository.save(movie);
-	Collections.reverse(result);
+        Collections.reverse(result);
         return gson.toJson(result);
       }
     }
