@@ -1,6 +1,7 @@
 package com.moviehub.models;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -26,11 +27,11 @@ public class Movie {
 	
 	@ManyToMany(mappedBy="likedMovies")
 	@JsonIgnore
-	List<User> likedUsers;
+	Set<User> likedUsers;
 	
 	@ManyToMany(mappedBy="reviewedMovies")
 	@JsonIgnore
-	List<User> reviewedUsers;
+	Set<User> reviewedUsers;
 	
 	@OneToMany(mappedBy="movie")
 	@JsonIgnore
@@ -96,19 +97,19 @@ public class Movie {
 		this.actors = actors;
 	}
 
-	public List<User> getLikedUsers() {
+	public Set<User> getLikedUsers() {
 		return likedUsers;
 	}
 
-	public void setLikedUsers(List<User> likedUsers) {
+	public void setLikedUsers(Set<User> likedUsers) {
 		this.likedUsers = likedUsers;
 	}
 
-	public List<User> getReviewedUsers() {
+	public Set<User> getReviewedUsers() {
 		return reviewedUsers;
 	}
 
-	public void setReviewedUsers(List<User> reviewedUsers) {
+	public void setReviewedUsers(Set<User> reviewedUsers) {
 		this.reviewedUsers = reviewedUsers;
 	}
 
@@ -118,7 +119,5 @@ public class Movie {
 
 	public void setReviews(List<Review> reviews) {
 		this.reviews = reviews;
-	}
-	
-	
+	}	
 }

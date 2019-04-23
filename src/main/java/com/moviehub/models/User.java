@@ -42,14 +42,14 @@ public class User {
 			inverseJoinColumns=@JoinColumn(name=
 			   "MOVIE_ID"))
 	@JsonIgnore
-	List<Movie> likedMovies;
+	Set<Movie> likedMovies;
 	
 	@ManyToMany(cascade = CascadeType.PERSIST)
 	@JoinTable(name="REVIEWS", joinColumns=@JoinColumn(name="USER_ID"),
 			inverseJoinColumns=@JoinColumn(name=
 			   "MOVIE_ID"))
 	@JsonIgnore
-	List<Movie> reviewedMovies;
+	Set<Movie> reviewedMovies;
 	
 	@OneToMany(mappedBy="user")
 	@JsonIgnore
@@ -131,19 +131,19 @@ public class User {
 		this.dateOfBirth = dateOfBirth;
 	}
 
-	public List<Movie> getLikedMovies() {
+	public Set<Movie> getLikedMovies() {
 		return likedMovies;
 	}
 
-	public void setLikedMovies(List<Movie> likedMovies) {
+	public void setLikedMovies(Set<Movie> likedMovies) {
 		this.likedMovies = likedMovies;
 	}
 
-	public List<Movie> getReviewedMovies() {
+	public Set<Movie> getReviewedMovies() {
 		return reviewedMovies;
 	}
 
-	public void setReviewedMovies(List<Movie> reviewedMovies) {
+	public void setReviewedMovies(Set<Movie> reviewedMovies) {
 		this.reviewedMovies = reviewedMovies;
 	}
 

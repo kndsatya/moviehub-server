@@ -31,28 +31,28 @@ public class Review {
 		
 	}
 
-	public int getReviewId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setReviewId(int reviewId) {
-		this.id = reviewId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
-	public Movie getMovieReviewed() {
+	public Movie getMovie() {
 		return movie;
 	}
 
-	public void setMovieReviewed(Movie movieReviewed) {
-		this.movie = movieReviewed;
+	public void setMovie(Movie movie) {
+		this.movie = movie;
 	}
 
-	public User getReviewedBy() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setReviewedBy(User reviewedBy) {
-		this.user = reviewedBy;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public String getReviewComments() {
@@ -62,4 +62,6 @@ public class Review {
 	public void setReviewComments(String reviewComments) {
 		this.reviewComments = reviewComments;
 	}
+
+	
 }
