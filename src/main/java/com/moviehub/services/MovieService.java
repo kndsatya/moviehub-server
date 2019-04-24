@@ -41,7 +41,7 @@ public class MovieService {
   @Autowired
   ReviewRepository reviewRepository;
 
-  // Creates a new movie if it doesn't already exist, else returns a new movie object
+
   @PostMapping("/api/movie")
   public Movie createMovie(@RequestBody Movie movie, HttpSession session) {
 

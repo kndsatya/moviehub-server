@@ -50,28 +50,27 @@ public class ReviewService {
 
     User currentUser = (User) session.getAttribute("currentUser");
 
-    // fetch user and movie from id's
+
     Optional<User> optionalUser = userRepository.findById(userId);
     Optional<Movie> optionalMovie = movieRepository.findById(movieId);
 
-    // check if user is logged in
+
     if (session.getAttribute("currentUser") != null && userId.intValue() == currentUser.getId().intValue()) {
 
-      // check if user and movies are present
+
       if (optionalUser.isPresent() && optionalMovie.isPresent()) {
 
         User user = optionalUser.get();
         Movie movie = optionalMovie.get();
 
-        // update the review object
+
         review.setMovie(movie);
         review.setUser(user);
 
-        // update user and movie sets
+
         movie.getReviewedUsers().add(user);
         user.getReviewedMovies().add(movie);
 
-        // save into all tables
         userRepository.save(user);
         movieRepository.save(movie);
         reviewRepository.save(review);

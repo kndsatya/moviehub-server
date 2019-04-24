@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,9 +38,6 @@ public class UserService {
   @Autowired
   MovieRepository movieRepository;
 
-  // Registers a new user, you said we might need to change the url pattern. Take a look later.
-  // Makes sure username doesn't already exist, returns a new user object if it already exists.
-  // Put apprporiate checks in front end.
   @PostMapping("/api/register")
   public User register(@RequestBody User user, HttpSession session) {
 
@@ -61,8 +59,6 @@ public class UserService {
 
   }
 
-  // Authenticates user's username and password and creates a session
-  // Returns existing user if valid, else a new user object
   @PostMapping("/api/login")
   public User login(@RequestBody User user, HttpSession session) {
 
@@ -84,15 +80,13 @@ public class UserService {
 
   }
 
-  // Logs the user out, ends session.
+
   @GetMapping("/api/logout")
   public void logout(HttpSession session) {
     session.invalidate();
   }
 
-  // Fetches the user profile, returns all user fields if it is the same user's profile.
-  // Else returns an object with only username, first name and last name
-  // Returns a new user object if the id is invalid.
+
   @GetMapping("/api/profile")
   public User profile(HttpSession session) {
 
@@ -110,7 +104,7 @@ public class UserService {
     return new User();
   }
 
-  // Finds user by user id, I'm only returning the user id, username and role as instructed.
+
   @GetMapping("/api/users/{userId}")
   public User findUserById(@PathVariable Integer userId, HttpSession session) {
 
@@ -133,7 +127,6 @@ public class UserService {
     return new User();
   }
 
-  // Returns all the user from the user table.
   @GetMapping("/api/users")
   public List<User> findAllUsers() {
 
@@ -146,6 +139,32 @@ public class UserService {
     }
 
     return allUsers;
+  }
+
+  @GetMapping("/api/users/{userId}/followers")
+  public List<User> findAllFollowers(@PathVariable("userId") Integer userId) {
+
+    Optional<User> optionalUser = userRepository.findById(userId);
+
+    if(!optionalUser.isPresent()){
+      return new ArrayList<>();
+    }
+
+    User user = optionalUser.get();
+    return new ArrayList<>(user.getFollowers());
+  }
+
+  @GetMapping("/api/users/{userId}/following")
+  public List<User> findAllFollowing(@PathVariable("userId") Integer userId) {
+
+    Optional<User> optionalUser = userRepository.findById(userId);
+
+    if(!optionalUser.isPresent()){
+      return new ArrayList<>();
+    }
+
+    User user = optionalUser.get();
+    return new ArrayList<>(user.getFollowingUsers());
   }
 
 
@@ -189,8 +208,6 @@ public class UserService {
     return new ArrayList<>();
   }
 
-  // Fetches all the reviews given by the specified critic.
-  // No role check required as reviews are stored as a list.
   @GetMapping("/api/user/{userId}/reviews")
   public String findAllUserReviews(@PathVariable("userId") Integer userId) {
     Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -219,5 +236,95 @@ public class UserService {
     return updatedUser;
   }
 
+  @GetMapping("/api/users/{followerId}/follow/users/{followeeId}/check")
+  public Boolean didFollowerUserFollow(@PathVariable("followerId") Integer followerId,
+                                       @PathVariable("followeeId") Integer followeeId){
+
+    Optional<User> optionalFollower = userRepository.findById(followerId);
+    if(!optionalFollower.isPresent()){
+      return false;
+    }
+
+    Optional<User> optionalFollowee = userRepository.findById(followeeId);
+
+    if(!optionalFollowee.isPresent()){
+      return false;
+    }
+
+    User follower = optionalFollower.get();
+    User followee = optionalFollowee.get();
+
+    if(followee.getFollowers().contains(follower)){
+       return true;
+    }
+
+    return false;
+  }
+
+  @PostMapping("/api/users/{followerId}/follow/users/{followeeId}")
+  public Boolean followUser(@PathVariable("followerId") Integer followerId,
+                        @PathVariable("followeeId") Integer followeeId, HttpSession session) {
+
+    User currentUser = (User) session.getAttribute("currentUser");
+
+    Optional<User> optionalFollower = userRepository.findById(followerId);
+    if(!optionalFollower.isPresent()){
+      return false;
+    }
+
+    Optional<User> optionalFollowee = userRepository.findById(followeeId);
+
+    if(!optionalFollowee.isPresent()){
+      return false;
+    }
+
+    if(currentUser!=null && currentUser.getId().intValue()==followerId.intValue()){
+
+        User follower = optionalFollower.get();
+        User followee = optionalFollowee.get();
+
+        follower.getFollowingUsers().add(followee);
+        followee.getFollowers().add(follower);
+
+        userRepository.save(follower);
+        userRepository.save(followee);
+        return true;
+    }
+
+     return false;
+  }
+
+  @DeleteMapping("/api/users/{followerId}/unfollow/users/{followeeId}")
+  public Boolean unFollowUser(@PathVariable("followerId") Integer followerId,
+                          @PathVariable("followeeId") Integer followeeId, HttpSession session) {
+
+    User currentUser = (User) session.getAttribute("currentUser");
+
+    Optional<User> optionalFollower = userRepository.findById(followerId);
+    if(!optionalFollower.isPresent()){
+      return false;
+    }
+
+    Optional<User> optionalFollowee = userRepository.findById(followeeId);
+
+    if(!optionalFollowee.isPresent()){
+      return false;
+    }
+
+    if(currentUser!=null && currentUser.getId().intValue()==followerId.intValue()){
+
+      User follower = optionalFollower.get();
+      User followee = optionalFollowee.get();
+
+      follower.getFollowingUsers().remove(followee);
+      followee.getFollowers().remove(follower);
+
+      userRepository.save(follower);
+      userRepository.save(followee);
+      return true;
+    }
+
+    return false;
+  }
 
 }

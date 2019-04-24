@@ -22,36 +22,36 @@ public class Movie {
 
   @Id
   @Expose
-  String id;
+  private String id;
   @Lob
-  String imdb_id;
+  private String imdb_id;
   @Expose
   @Lob
-  String title;
+  private String title;
   @Lob
   @Column(length=50000)
-  String poster_path;
+  private String poster_path;
   @Lob
   @Column(length=50000)
-  String overview;
+  private String overview;
   @Lob
   @Column(length=50000)
-  String genre;
+  private String genre;
   @Lob
   @Column(length=50000)
-  String actors;
+  private String actors;
 
   @ManyToMany(mappedBy = "likedMovies")
   @JsonIgnore
-  Set<User> likedUsers;
+  private Set<User> likedUsers;
 
   @ManyToMany(mappedBy = "reviewedMovies")
   @JsonIgnore
-  Set<User> reviewedUsers;
+  private Set<User> reviewedUsers;
 
   @OneToMany(mappedBy = "movie")
   @JsonIgnore
-  List<Review> reviews;
+  private List<Review> reviews;
 
   public Movie() {
 

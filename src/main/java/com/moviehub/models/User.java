@@ -32,40 +32,64 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Expose
-  Integer id;
+  private Integer id;
 
   @Expose
   @Lob
-  String username;
+  private String username;
   @Lob
-  String firstName;
+  private String firstName;
   @Lob
-  String lastName;
+  private String lastName;
   @Lob
-  String password;
-  String phoneNumber;
+  private String password;
+  private String phoneNumber;
   @Lob
-  String email;
-  Role role;
-  String dateOfBirth;
+  private String email;
+  private Role role;
+  private String dateOfBirth;
 
   @ManyToMany(cascade = CascadeType.PERSIST)
   @JoinTable(name = "LIKES", joinColumns = @JoinColumn(name = "USER_ID"),
           inverseJoinColumns = @JoinColumn(name =
                   "MOVIE_ID"))
   @JsonIgnore
-  Set<Movie> likedMovies;
+  private Set<Movie> likedMovies;
 
   @ManyToMany(cascade = CascadeType.PERSIST)
   @JoinTable(name = "REVIEWS", joinColumns = @JoinColumn(name = "USER_ID"),
           inverseJoinColumns = @JoinColumn(name =
                   "MOVIE_ID"))
   @JsonIgnore
-  Set<Movie> reviewedMovies;
+  private Set<Movie> reviewedMovies;
 
   @OneToMany(mappedBy = "user")
   @JsonIgnore
-  List<Review> reviews;
+  private List<Review> reviews;
+
+  public Set<User> getFollowers() {
+    return followers;
+  }
+
+  public void setFollowers(Set<User> followers) {
+    this.followers = followers;
+  }
+
+  public Set<User> getFollowingUsers() {
+    return followingUsers;
+  }
+
+  public void setFollowingUsers(Set<User> followingUsers) {
+    this.followingUsers = followingUsers;
+  }
+
+  @JsonIgnore
+  @ManyToMany(mappedBy="followingUsers")
+  private Set<User> followers;
+
+  @JsonIgnore
+  @ManyToMany
+  private Set<User> followingUsers;
 
   public User() {
 

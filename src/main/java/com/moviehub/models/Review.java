@@ -20,21 +20,21 @@ public class Review {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Expose
-	Integer id;
+  private Integer id;
 	
 	@ManyToOne()
 	@JsonIgnore
   @Expose
-	Movie movie;
+  private Movie movie;
 	
 	@ManyToOne()
 	@JsonIgnore
   @Expose
-	User user;
+  private User user;
 	@Expose
   @Lob
   @Column(length=50000)
-	String reviewComment;
+  private String reviewComment;
 	
 	public Review() {
 		
