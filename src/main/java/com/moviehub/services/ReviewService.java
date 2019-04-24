@@ -67,14 +67,17 @@ public class ReviewService {
         review.setMovie(movie);
         review.setUser(user);
 
+        Review newReview = reviewRepository.save(review);
 
         movie.getReviewedUsers().add(user);
+        movie.getReviews().add(newReview);
         user.getReviewedMovies().add(movie);
+        user.getReviews().add(newReview);
 
         userRepository.save(user);
         movieRepository.save(movie);
-        reviewRepository.save(review);
-        return review;
+
+        return newReview;
       }
     }
 
