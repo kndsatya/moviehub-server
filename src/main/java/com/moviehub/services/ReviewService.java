@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -112,7 +113,7 @@ public class ReviewService {
 
 
   @DeleteMapping("/api/reviews/{reviewId}")
-  public String deleteReview(@PathVariable("reviewId") Integer reviewId, HttpSession session) {
+  public String deleteReviewOfAUser(@PathVariable("reviewId") Integer reviewId, HttpSession session) {
 
     User currentUser = (User) session.getAttribute("currentUser");
     Optional<Review> optional = reviewRepository.findById(reviewId);
@@ -125,22 +126,21 @@ public class ReviewService {
       Movie movie = review.getMovie();
 
       if (currentUser.getId().intValue() == user.getId().intValue()) {
-       reviewRepository.delete(review);
+        reviewRepository.delete(review);
         Iterator<Review> reviewIterator = reviewRepository.findAll().iterator();
         List<Review> result = new ArrayList<>();
 
         while (reviewIterator.hasNext()) {
-             result.add(reviewIterator.next());
+          result.add(reviewIterator.next());
         }
 
 
-
-
-        for (Review rev: result) {
+        for (Review rev : result) {
 
           if (rev.getMovie().getId().equals(review.getMovie().getId())
 
                   && rev.getUser().getId().intValue() == review.getUser().getId().intValue()) {
+            result = result.stream().filter(x -> x.getUser().getId() == currentUser.getId()).collect(Collectors.toList());
             Collections.reverse(result);
             return gson.toJson(result);
           }
@@ -154,6 +154,7 @@ public class ReviewService {
         user.getReviews().remove(review);
         userRepository.save(user);
         movieRepository.save(movie);
+        result = result.stream().filter(x -> x.getUser().getId() == currentUser.getId()).collect(Collectors.toList());
         Collections.reverse(result);
         return gson.toJson(result);
       }
@@ -161,32 +162,55 @@ public class ReviewService {
     return gson.toJson(new ArrayList<>());
   }
 
-  @GetMapping("/api/review/{reviewId}/user")
-  public User findUserOfAReview(@PathVariable Integer reviewId) {
-    Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+  @DeleteMapping("/api/movies/{movieId}/reviews/{reviewId}")
+  public String deleteReviewOfAMovie(@PathVariable("movieId") String movieId,
+                                     @PathVariable("reviewId") Integer reviewId, HttpSession session) {
 
-    if (optionalReview.isPresent()) {
-      Review review = optionalReview.get();
-      User user = new User();
-      user.setId(review.getUser().getId());
-      user.setUsername(review.getUser().getUsername());
-      return user;
+    User currentUser = (User) session.getAttribute("currentUser");
+    Optional<Review> optional = reviewRepository.findById(reviewId);
+
+    Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    if (currentUser != null && optional.isPresent()) {
+
+      Review review = optional.get();
+      User user = review.getUser();
+      Movie movie = review.getMovie();
+
+      if (currentUser.getId().intValue() == user.getId().intValue() && movieId.equals(movie.getId())) {
+        reviewRepository.delete(review);
+        Iterator<Review> reviewIterator = reviewRepository.findAll().iterator();
+        List<Review> result = new ArrayList<>();
+
+        while (reviewIterator.hasNext()) {
+          result.add(reviewIterator.next());
+        }
+
+
+        for (Review rev : result) {
+
+          if (rev.getMovie().getId().equals(review.getMovie().getId())
+
+                  && rev.getUser().getId().intValue() == review.getUser().getId().intValue()) {
+            result = result.stream().filter(x -> x.getMovie().getId().equals(movieId)).collect(Collectors.toList());
+            Collections.reverse(result);
+            return gson.toJson(result);
+          }
+        }
+
+        Set<Movie> movieSet = user.getReviewedMovies();
+        Set<User> userSet = movie.getReviewedUsers();
+
+        movieSet.remove(review.getMovie());
+        userSet.remove(review.getUser());
+        user.getReviews().remove(review);
+        userRepository.save(user);
+        movieRepository.save(movie);
+        result = result.stream().filter(x -> x.getMovie().getId().equals(movieId)).collect(Collectors.toList());
+        Collections.reverse(result);
+        return gson.toJson(result);
+      }
     }
-    return new User();
-  }
-
-  @GetMapping("/api/review/{reviewId}/movie")
-  public Movie findMovieOfAReview(@PathVariable Integer reviewId) {
-    Optional<Review> optionalReview = reviewRepository.findById(reviewId);
-
-    if (optionalReview.isPresent()) {
-      Review review = optionalReview.get();
-      Movie movie = new Movie();
-      movie.setId(review.getMovie().getId());
-      movie.setTitle(review.getMovie().getTitle());
-      return movie;
-    }
-    return new Movie();
+    return gson.toJson(new ArrayList<>());
   }
 
 }
